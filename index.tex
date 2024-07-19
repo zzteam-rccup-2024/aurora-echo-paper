@@ -176,6 +176,30 @@
 
     The invocation prompt is attached in the appendix.
 
+    \section{Why Aurora Echo?}\label{sec:why}
+
+    Using \textbf{Aurora Echo} means that you are using a vivid and direct feedback system.
+    It not only pursues the directness of the feedback, a deep integration of LLMs, and a privacy-guaranteed system.
+
+    \subsection{Security and Privacy}\label{subsec:security}
+
+    The security issue of artificial intelligence is a hot topic.
+    Calling unauthorized APIs, or storing the data without permission, is a serious problem.
+    In \textbf{Aurora Echo}, system not only provides interfaces for calling the APIs, but also recommend users who have the ability to run the model locally.
+
+    Taking \texttt{Qwen2-1.5B-Instruct} as an example, the performance requirements is lower than other models, but its usability is still guaranteed for the feedback analysis.
+    We tested the model on Apple's M2 Pro, we can generate the response in about \qty{3}{\minute}.
+    It may be slow, but the performance of devices running Large Language Models are better.
+
+    We also provide API to OpenAI's ChatGPT-4o Mini.
+    The model is a smaller version of ChatGPT-4o, which is a model that can generate the response in real-time.
+
+    \subsection{Multimodal Feedback}\label{subsec:multimodal}
+
+    Not only the text feedback, but also the audio-visual feedback is provided.
+    It enhances the directness of the feedback, reflecting the most immediate aspect of the feedback giver.
+    Though Large Language Models now are available to directly have conversations ``face''-to-face, costs may be higher than this system.
+
     \section{Conclusion}\label{sec:conclusion}
 
     The \textbf{Aurora Echo} system is a new feedback system that provides audio-visual feedback for the resource provider.
@@ -183,6 +207,22 @@
     The system is also privacy-friendly, and we provide a web interface for the resource provider to check the feedback and the analysis.
 
     The code of the system is available at \url{https://https://github.com/zzteam-rccup/aurora-echo.git}.
+
+    The next step for the project are:
+
+    \begin{itemize}
+        \item Improve the frontend interface.
+        \item Use the API provided by browser to capture the audio and vision, to support the coroutine.
+        \item Add some extensions for the system.
+        \item Improve the accuracy of facial emotion recognition.
+        \item Optimize the performance of the system.
+    \end{itemize}
+
+    \paragraph{Acknowledgements}
+
+    We are grateful to Shanghai Jiao Tong University for providing the summer camp, and the teachers for guidance of artificial intelligence.
+    We are grateful to Baidu corporation for providing the LLMs, and OpenAI for providing the ChatGPT-4o Mini.
+    We are grateful to \texttt{featurize} for providing GPU-accelerated computing service.
 
     \nocite{*}
     \bibliography{./citations}
