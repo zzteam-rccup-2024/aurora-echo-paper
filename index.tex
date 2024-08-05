@@ -5,7 +5,6 @@
 \usepackage{fontspec}
 \usepackage{url}
 \usepackage{tikz}
-\usepackage{hyperref}
 \usepackage{float}
 \usepackage{siunitx}
 \setmainfont{Times New Roman}
@@ -14,8 +13,10 @@
 \author{
     Ethan Goh \\ \texttt{7086cmd@gmail.com} \\ Zhenhai High School
         \thanks{The article is written during the summer camp held by Shanghai Jiao Tong University, which provides us a stage to crate innoative applications with artificial intelligence. Ethan Goh's Chinese Pinyin name: Wu Chengyu. Ethan Goh designed the project and the architecture of the system, and takes the responsibility of the development.}
-    \and Wu Bingzhen \\ \texttt{2220150940@qq.com} \\ Zhenhai High School \thanks{Wu develops some extensions for the system, and takes the responsibility of the testing.}
-    \and Wang Qinyu \\ \texttt{1224884353@qq.com} \\ Zhenhai High School \thanks{Wang makes the presentation for the project, and participate in the development.}
+    \and Bingzhen Wu \\ Zhenhai High School \thanks{Wu develops some extensions for the system, and takes the responsibility of the testing.}
+    \and Qinyu Wang \\ Zhenhai High School \thanks{Wang makes the presentation for the project, and participate in the development.}
+    \and Pengzhi Chu \\ Shanghai Jiao Tong University
+    \and Xiaoni Liang \\ Shanghai Jiao Tong University
 }
 \date{\today}
 
@@ -170,7 +171,7 @@
 
     The Large Language Model (LLM) is the core of the feedback analysis system.
 
-    Considering the environment, we selected \texttt{Llama-3-8B-Instruct}\cite{llama3modelcard}, or \texttt{Qwen2-1.5B-Instruct}\cite{qwen2} as the offline LLM, or \texttt{gpt-3.5-turbo}\cite{gpt-3.5-turbo} or \texttt{Llama-3-70B-Instruct} (provided by Baidu)\cite{llama-3-70b-instruct} as the online LLM.
+    Considering the environment, we selected \texttt{Llama-3.1-8B}\cite{llama3modelcard,llama-3.1}\footnote[1]{Actually the model always ends with \texttt{-Instruct}, but for the sake of typography, we just ignored the suffix.}, or \texttt{Qwen2-1.5B}\cite{qwen2} as the offline LLM, or \texttt{gpt-4o-mini}\cite{gpt-4o-mini} or \texttt{Llama-3.1-405B} as the online LLM\@.
 
     The LLM is responsible for summarizing the feedback, analyzing the feedback, and generating the response.
 
@@ -187,7 +188,7 @@
     Calling unauthorized APIs, or storing the data without permission, is a serious problem.
     In \textbf{Aurora Echo}, system not only provides interfaces for calling the APIs, but also recommend users who have the ability to run the model locally.
 
-    Taking \texttt{Qwen2-1.5B-Instruct} as an example, the performance requirements is lower than other models, but its usability is still guaranteed for the feedback analysis.
+    Taking \texttt{Qwen2-1.5B} as an example, the performance requirements is lower than other models, but its usability is still guaranteed for the feedback analysis.
     We tested the model on Apple's M2 Pro, we can generate the response in about \qty{3}{\minute}.
     It may be slow, but the performance of devices running Large Language Models are better.
 
@@ -200,19 +201,56 @@
     It enhances the directness of the feedback, reflecting the most immediate aspect of the feedback giver.
     Though Large Language Models now are available to directly have conversations ``face''-to-face, costs may be higher than this system.
 
+    \section{Comparison}\label{sec:comparison}
+
+    The ChatGPT-4o can understand the video very well, so it can also abstract the feedback from the video. \cite{tang2024videounderstandinglargelanguage}
+    But why we do not use ChatGPT-4o to abstract the feedback from the video?
+
+    \subsection{Cost}\label{subsec:cost}
+
+    Just taking the image module as an example, and the audio module similar.
+
+    According to a small calculation, if you put a \qty{30}{\second} video to a LLM, you may spend about \qty{200}{GiB} of data, and about \qty{8}{\kilo\watt} energy for parsing the video. \cite{husom2024pricepromptingprofilingenergy, samsi2023wordswattsbenchmarkingenergy}
+
+    If using the Aurora Echo, you can just run the model on the local CPU, even on the web (with WASM and MediaPipe web), you can save a lot of energy and data.
+
+    Suppose there were a video in \qty{30}{\second} (30 fps).
+    We just need to recognize 900 frames of the gesture and face.
+    Amount parameters of models (including the facial emotion recognition) related to image processing is at most 2 Billion parameters.
+
+    Also, the extraction of LLM is also energy-consuming.
+
+    Though finally Aurora Echo uses the LLM to generate the \texttt{function call} and to summarize, this kind of task doesn't require a lot of parameters, and the model can also run on the local CPU\@.
+
+    \subsection{Privacy}\label{subsec:privacy}
+
+    Aurora Echo runs model on the local.
+    In the best case scenario, ALL the models, including the LLM, can run on local (with the help of uniformed memory from Apple Silicon, or using OpenVINO for Intel CPU).
+    Through functions above, we can easily run \texttt{Qwen2-1.5B}, or \texttt{Llama-3.1-8B} on the local, once you have at lease \qty{16}{GiB} of memory.
+
+    Also, the face is mosaic-permitted, and the video is not stored.
+    What the system stores is only the report and the function-call to the database.
+
+    \subsection{Directness}\label{subsec:directness}
+
+    The directness of the feedback is the most important aspect of the system.
+
+    Through Aurora Echo, we can also promptly expand the conversation with the help of LLM\@.
+    We can use prompt to invoke the LLM, and have a chat to response the most immediate aspect of the feedback giver.
+
     \section{Conclusion}\label{sec:conclusion}
 
     The \textbf{Aurora Echo} system is a new feedback system that provides audio-visual feedback for the resource provider.
     Through its 3 parts, the audio process system, the visual recognition system, and the feedback analysis system, we can provide a more vivid and direct feedback system for the resource provider.
     The system is also privacy-friendly, and we provide a web interface for the resource provider to check the feedback and the analysis.
 
-    The code of the system is available at \url{https://https://github.com/zzteam-rccup/aurora-echo.git}.
+    The code of the system is available at \url{https://github.com/zzteam-rccup/aurora-echo.git}.
 
     The next step for the project are:
 
     \begin{itemize}
         \item Improve the frontend interface.
-        \item Use the API provided by browser to capture the audio and vision, to support the coroutine.
+        \item Migrate the MediaPipe and the OpenCV part to the web, with the help of WASM and Rust.
         \item Add some extensions for the system.
         \item Improve the accuracy of facial emotion recognition.
         \item Optimize the performance of the system.
@@ -221,8 +259,6 @@
     \paragraph{Acknowledgements}
 
     We are grateful to Shanghai Jiao Tong University for providing the summer camp, and the teachers for guidance of artificial intelligence.
-    We are grateful to Baidu corporation for providing the LLMs, and OpenAI for providing the ChatGPT-4o Mini.
-    We are grateful to \texttt{featurize} for providing GPU-accelerated computing service.
 
     \nocite{*}
     \bibliography{./citations}
